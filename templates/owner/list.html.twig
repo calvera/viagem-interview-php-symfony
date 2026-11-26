@@ -1,8 +1,73 @@
 {% extends 'base.html.twig' %}
+{% import '_macros.html.twig' as m %}
 {% set menu = 'owners' %}
 
 {% block title %}Vlastníci{% endblock %}
 
 {% block body %}
     <h1>Vlastníci pozemků</h1>
+
+    {{ include('list/_filters.html.twig', {
+        filters: [
+            {name: 'f_municipality_id', label: 'Obec', type: 'hidden', value: query.municipalityId, title: municipality.name ?? null},
+            {name: 'f_municipality', label: 'Obec', type: 'text', value: query.municipality, input: query.municipalityInput, note: query.municipalityNote},
+            {name: 'f_type', label: 'Typ', type: 'select', value: query.type, options: {F: 'Fyzická osoba', P: 'Právnická osoba'}},
+            {name: 'f_dnc', label: 'Neoslovovat', type: 'select', value: query.dnc, options: {1: 'ano', 0: 'ne'}},
+        ],
+        search: {value: query.search, placeholder: 'jméno, příjmení nebo IČO'},
+    }) }}
+    {{ include('list/_info.html.twig', {item_name: 'vlastníků', search: query.search}) }}
+
+    {% if list.total == 0 %}
+        <p class="empty">Nebyly nalezeny žádné vlastníků.</p>
+    {% else %}
+        <table class="table-list">
+            <thead>
+                <tr>
+                    <th class="w-[26%]">Vlastník</th>
+                    <th class="w-[10%]">Typ</th>
+                    <th class="w-[10%]">Narození / IČO</th>
+                    <th class="w-[16%]">Obec</th>
+                    <th class="w-[6%]">Parcel</th>
+                    {% if in_municipality is not null %}<th class="w-[10%]">V obci</th>{% endif %}
+                    <th class="w-[10%]">Termín oslovení</th>
+                    <th class="w-[12%]">{{ include('list/_sort_link.html.twig', {label: 'Založeno', key: 'o.created_at'}) }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for o in list.items %}
+                    {% set parcels = parcel_counts[o.id] ?? 0 %}
+                    <tr{% if parcels == 0 %} class="no_parcels"{% endif %}>
+                        <td>
+                            <a href="{{ path('owner_detail', {id: o.id}) }}">{{ o.displayName }}</a>
+                            {% if o.doNotContact %}<span class="badge badge-red">neoslovovat</span>{% endif %}
+                            {% if o.note %}<span class="badge" title="{{ o.note }}">pozn.</span>{% endif %}
+                        </td>
+                        <td>{{ o.type.label }}</td>
+                        <td>{{ o.type.value == 'P' ? 'IČO ' ~ o.ico : m.date_or(o.birthDate) }}</td>
+                        <td>{{ o.municipality.name }}</td>
+                        <td class="right">{{ parcels|number_format(0, ',', ' ') }}</td>
+                        {% if in_municipality is not null %}
+                            {% set in = in_municipality[o.id] ?? null %}
+                            <td>{% if in %}{{ in.count }} <small>({{ in.area }})</small>{% else %}<span class="muted">–</span>{% endif %}</td>
+                        {% endif %}
+                        <td>
+                            {%- if o.duedate is null -%}
+                                <span class="muted">nenastaven</span>
+                            {%- else -%}
+                                <span class="{{ o.isOverdue ? 'overdue' : 'planned' }}">{{ o.duedate|date('j. n. Y') }}</span>
+                            {%- endif -%}
+                        </td>
+                        <td>{{ m.date_or(o.createdAt, '–', 'j. n. Y H:i') }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {{ include('list/_pagination.html.twig') }}
+    {% endif %}
+
+    <p class="hint">
+        Do pole <b>Hledat</b> lze zadat i osmimístné IČO. Obec stačí zadat částí názvu, např. „Lhota“.
+        Šedě jsou vlastníci bez evidovaných parcel.
+    </p>
 {% endblock %}

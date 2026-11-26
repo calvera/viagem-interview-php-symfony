@@ -87,4 +87,10 @@ class Owner
 
         return $name ? $this->displayName() : $this->lastName;
     }
+
+    /** The contact date has passed; today is not overdue yet (legacy OPENQUESTIONS.md, question 2). */
+    public function isOverdue(\DateTimeImmutable $today = new \DateTimeImmutable('today')): bool
+    {
+        return $this->duedate !== null && $this->duedate < $today;
+    }
 }
