@@ -1,25 +1,40 @@
+{% set menu_items = {dashboard: 'Přehled', owners: 'Vlastníci', parcels: 'Parcely', municipalities: 'Obce'} %}
+{% set menu_routes = {dashboard: 'dashboard', owners: 'owner_list', parcels: 'parcel_list', municipalities: 'municipality_list'} %}
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
-        {% block stylesheets %}
-            {{ vite_entry_link_tags('app') }}
-        {% endblock %}
+<html lang="cs">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}{% endblock %} | {{ app_name }}</title>
+    {{ vite_entry_link_tags('app') }}
+    {{ vite_entry_script_tags('app') }}
+</head>
+<body>
+<div id="header" class="flex h-[46px] items-center gap-6 bg-nav px-4 text-white max-[800px]:h-auto max-[800px]:flex-wrap">
+    <a href="{{ path('dashboard') }}" class="logo text-[15px] font-bold text-white no-underline hover:text-white">{{ app_name }}</a>
+    <ul id="menu" class="m-0 flex flex-1 list-none p-0">
+        {% for key, title in menu_items %}
+            <li{% if key == (menu ?? '') %} class="active"{% endif %}>
+                <a href="{{ path(menu_routes[key]) }}" class="block px-3.5 py-3.5 no-underline hover:bg-nav-active hover:text-white {{ key == (menu ?? '') ? 'bg-nav-active text-white' : 'text-nav-text' }}">{{ title }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+    <span class="user text-nav-text">Přihlášen: <b>{{ app_user }}</b></span>
+</div>
 
-        {% block javascripts %}
-            {{ vite_entry_script_tags('app') }}
-        {% endblock %}
+<div id="main_content" class="m-4 min-h-[400px] border border-line bg-white px-5 py-4">
+    {% for type, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="flash flash-{{ type }}">{{ message }}</div>
+        {% endfor %}
+    {% endfor %}
+    {% block body %}{% endblock %}
+</div>
 
-        {% set frankenphp_hot_reload = app.request.server.get('FRANKENPHP_HOT_RELOAD') %}
-        {% if frankenphp_hot_reload %}
-        <meta name="frankenphp-hot-reload:url" content="{{ frankenphp_hot_reload }}">
-        <script src="https://cdn.jsdelivr.net/npm/idiomorph"></script>
-        <script src="https://cdn.jsdelivr.net/npm/frankenphp-hot-reload/+esm" type="module"></script>
-        {% endif %}
-    </head>
-    <body>
-        {% block body %}{% endblock %}
-    </body>
+<div id="footer" class="mx-4 mb-4 text-[11px] text-footer">
+    {{ app_name }} {{ app_version }}
+    &middot; vygenerováno za {{ (('now'|date('U.u')) - app.request.server.get('REQUEST_TIME_FLOAT'))|number_format(2, ',', ' ') }} s
+    &middot; SQL dotazů: {{ query_counter.count }}
+</div>
+</body>
 </html>

@@ -1,0 +1,183 @@
+@import "tailwindcss";
+
+/* Colours and font of the legacy css/style.css. */
+@theme {
+    --font-sans: Tahoma, Verdana, Arial, sans-serif;
+    --font-mono: ui-monospace, Menlo, Consolas, monospace;
+
+    --color-ink: #222;
+    --color-page: #eef1f4;
+    --color-link: #1f5f99;
+    --color-danger: #c0392b;
+    --color-ok: #2e7d32;
+    --color-nav: #24384d;
+    --color-nav-active: #31506d;
+    --color-nav-text: #cfdbe6;
+    --color-line: #d5dbe1;
+    --color-panel: #f5f7f9;
+    --color-panel-line: #e0e5ea;
+    --color-field: #b9c3cc;
+    --color-primary: #2a73b5;
+    --color-primary-dark: #1f5f99;
+    --color-export: #3f8f4f;
+    --color-export-dark: #33783f;
+    --color-head: #e4e9ee;
+    --color-head-line: #c8d0d8;
+    --color-row-line: #e6eaee;
+    --color-row-hover: #f7fafc;
+    --color-faded: #8a96a2;
+    --color-label: #5a6773;
+    --color-muted: #9aa5b0;
+    --color-hint: #6b7884;
+    --color-footer: #7a8794;
+    --color-badge: #dfe6ec;
+    --color-badge-text: #39495a;
+    --color-card: #f8fafb;
+    --color-card-line: #dfe5ea;
+    --color-option-active: #e4eef7;
+    --color-flash-ok: #e9f6ea;
+    --color-flash-ok-line: #9ccc9f;
+    --color-flash-error: #fbeceb;
+    --color-flash-error-line: #e3a29a;
+}
+
+@layer base {
+    body {
+        @apply bg-page font-sans text-[13px] text-ink;
+    }
+
+    a {
+        @apply text-link underline hover:text-danger;
+    }
+
+    h1 {
+        @apply mb-3.5 text-xl font-bold;
+    }
+
+    h2 {
+        @apply mt-6 mb-2.5 text-base font-bold;
+    }
+
+    input[type="text"],
+    input[type="date"],
+    select,
+    textarea {
+        @apply border border-field bg-white px-1.5 py-1;
+    }
+}
+
+@layer components {
+    .btn {
+        @apply inline-block cursor-pointer border border-primary-dark bg-primary px-3 py-1 text-white no-underline hover:text-white;
+    }
+
+    .btn-sm {
+        @apply px-1.5 py-px text-[11px];
+    }
+
+    .btn-export {
+        @apply border-export-dark bg-export;
+    }
+
+    .badge {
+        @apply inline-block rounded-[3px] bg-badge px-1.5 py-px text-[11px] text-badge-text;
+    }
+
+    .badge-red {
+        @apply bg-danger text-white;
+    }
+
+    .table-list {
+        @apply w-full border-collapse;
+
+        & th {
+            @apply whitespace-nowrap border-b-2 border-head-line bg-head px-2 py-1.5 text-left font-bold;
+        }
+
+        & th a {
+            @apply text-ink no-underline;
+        }
+
+        & td {
+            @apply border-b border-row-line px-2 py-1.5 align-top;
+        }
+
+        & tr:hover td {
+            @apply bg-row-hover;
+        }
+
+        & tr.no_parcels td {
+            @apply text-faded;
+        }
+
+        & .right {
+            @apply text-right;
+        }
+    }
+
+    .table-detail {
+        @apply w-full border-collapse;
+
+        & th {
+            @apply w-[35%] border-b border-page px-2 py-1.5 text-left font-normal text-label;
+        }
+
+        & td {
+            @apply border-b border-page px-2 py-1.5;
+        }
+    }
+
+    .card {
+        @apply min-w-40 flex-1 border border-card-line bg-card p-3.5;
+    }
+
+    .flash-ok {
+        @apply mb-2.5 border border-flash-ok-line bg-flash-ok px-3 py-2;
+    }
+
+    .flash-error {
+        @apply mb-2.5 border border-flash-error-line bg-flash-error px-3 py-2;
+    }
+
+    /* Results of stimulus-autocomplete (results target). */
+    .autocomplete {
+        @apply absolute top-full left-0 z-10 m-0 min-w-64 list-none border border-field bg-white p-0;
+
+        &:empty {
+            @apply hidden;
+        }
+
+        & li {
+            @apply cursor-pointer px-2 py-1;
+        }
+
+        & li:hover,
+        & li.active {
+            @apply bg-option-active;
+        }
+    }
+}
+
+/* State classes kept from legacy (tests look for them). */
+@layer utilities {
+    .muted {
+        @apply text-muted;
+    }
+
+    .overdue {
+        @apply font-bold text-danger;
+    }
+
+    .planned {
+        @apply text-ok;
+    }
+
+    .filter_note {
+        @apply text-danger;
+    }
+
+    .empty,
+    .hint {
+        @apply text-hint;
+    }
+}

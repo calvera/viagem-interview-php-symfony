@@ -1,0 +1,4 @@
+{# Date "15. 5. 2021" (or with time when format is given), placeholder for a missing date. #}
+{% macro date_or(value, placeholder = '–', format = 'j. n. Y') %}
+    {{- value ? value|date(format) : placeholder -}}
+{% endmacro %}

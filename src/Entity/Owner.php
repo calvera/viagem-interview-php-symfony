@@ -69,4 +69,22 @@ class Owner
         public \DateTimeImmutable $createdAt = new \DateTimeImmutable(),
     ) {
     }
+
+    /** Name in lists: company name, or "title first last" of a person. */
+    public function displayName(): string
+    {
+        if ($this->type === OwnerType::Company) {
+            return $this->lastName;
+        }
+
+        return trim($this->title.' '.$this->firstName.' '.$this->lastName);
+    }
+
+    /** Name on the detail page: a person without a first name is shown by the last name only (no title). */
+    public function detailName(): string
+    {
+        $name = $this->type === OwnerType::Company ? $this->lastName : $this->firstName;
+
+        return $name ? $this->displayName() : $this->lastName;
+    }
 }

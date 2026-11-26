@@ -1,0 +1,3 @@
+pentatrion_vite:
+    # Dev asset proxy (route /build) to the Vite dev server running on the host.
+    proxy_origin: '%env(VITE_DEV_SERVER)%'

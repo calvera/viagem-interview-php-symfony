@@ -1,3 +1,3 @@
-import "./app.css";
-
-console.log("Happy coding !!");
+import "./styles/app.css";
+import "@hotwired/turbo";
+import "./bootstrap.js";

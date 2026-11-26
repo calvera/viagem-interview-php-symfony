@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Repository\ParcelRepository;
+use App\Value\Area;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ParcelRepository::class)]
@@ -34,5 +35,10 @@ class Parcel
         #[ORM\Column]
         public int $areaM2,
     ) {
+    }
+
+    public function area(): Area
+    {
+        return new Area($this->areaM2);
     }
 }

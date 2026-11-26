@@ -1,5 +1,10 @@
 twig:
     file_name_pattern: '*.twig'
+    globals:
+        app_name: 'Evidence vlastníků'
+        app_version: '%app.version%'
+        app_user: '%env(APP_USER)%'
+        query_counter: '@App\Doctrine\QueryCounter'
 
 when@test:
     twig:

@@ -6,7 +6,14 @@
         "build": "vite build"
     },
     "devDependencies": {
+        "@tailwindcss/vite": "^4.3.5",
+        "tailwindcss": "^4.3.5",
         "vite": "^8.0",
         "vite-plugin-symfony": "^8.2"
+    },
+    "dependencies": {
+        "@hotwired/stimulus": "^3.2.2",
+        "@hotwired/turbo": "^8.0.23",
+        "stimulus-autocomplete": "^3.1.0"
     }
 }
