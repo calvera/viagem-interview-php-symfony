@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Dto;
 
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\Tools\Pagination\CountWalker;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
 /**
@@ -20,12 +21,12 @@ final readonly class ListPage
     }
 
     /**
-     * Two queries via Doctrine Paginator: COUNT(DISTINCT id) and the page itself
-     * (lists join only many-to-one relations, so no subquery is needed).
+     * Two queries via Doctrine Paginator: COUNT(*) and the page itself. Lists join only many-to-one
+     * relations, so rows are unique: no subquery and no COUNT(DISTINCT id) (3x slower on 800k parcels).
      */
     public static function of(QueryBuilder $qb, int $page): self
     {
-        $paginator = new Paginator($qb, fetchJoinCollection: false);
+        $paginator = new Paginator($qb->getQuery()->setHint(CountWalker::HINT_DISTINCT, false), fetchJoinCollection: false);
         $paginator->setUseOutputWalkers(false);
         $total = \count($paginator);
         $pages = (int) ceil($total / self::LIMIT);

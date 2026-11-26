@@ -46,6 +46,9 @@ class MunicipalityRepository extends ServiceEntityRepository
      */
     public function parcelCounts(array $ids): array
     {
+        if ($ids === []) {
+            return [];
+        }
         $rows = $this->getEntityManager()->createQuery(
             'SELECT IDENTITY(p.municipality) AS id, COUNT(p.id) AS cnt FROM App\Entity\Parcel p
              WHERE p.municipality IN (:ids) GROUP BY p.municipality',
