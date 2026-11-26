@@ -1,0 +1,39 @@
+{#
+    GET form of a list.
+    filters: list of {name, label, type ('select' | 'text' | 'autocomplete' | 'hidden'), value, options, input, note, title}
+    search: {value, placeholder} or null; export_url: link "Export do CSV" or null
+#}
+<form method="get" action="{{ path(app.request.attributes.get('_route')) }}" class="filters mb-2.5 border border-panel-line bg-panel p-2.5">
+    {% for f in filters %}
+        {% if f.type == 'hidden' %}
+            {% if f.value != '' %}
+                <span class="hidden_filter">{{ f.label }}: <b>{{ f.title ?? f.value }}</b> <a href="{{ path(app.request.attributes.get('_route'), app.request.query.all|filter((v, k) => k not in [f.name, 'page'])) }}" title="zrušit">×</a></span>
+                <input type="hidden" name="{{ f.name }}" value="{{ f.value }}">
+            {% endif %}
+        {% else %}
+            <label class="relative mr-2.5 inline-block"{% if f.type == 'autocomplete' %} data-controller="autocomplete" data-autocomplete-url-value="{{ path('municipality_autocomplete') }}" data-autocomplete-min-length-value="2" data-autocomplete-delay-value="250"{% endif %}>
+                {{ f.label }}
+                {% if f.type == 'select' %}
+                    <select name="{{ f.name }}">
+                        <option value="">– vše –</option>
+                        {% for value, title in f.options %}
+                            <option value="{{ value }}"{% if (value ~ '') is same as(f.value) %} selected{% endif %}>{{ title }}</option>
+                        {% endfor %}
+                    </select>
+                {% else %}
+                    <input type="text" name="{{ f.name }}" value="{{ f.input ?? f.value }}"{% if f.type == 'autocomplete' %} autocomplete="off" data-autocomplete-target="input"{% endif %}>
+                    {% if f.note ?? false %}<small class="filter_note">{{ f.note }}</small>{% endif %}
+                    {% if f.type == 'autocomplete' %}<ul class="autocomplete" data-autocomplete-target="results"></ul>{% endif %}
+                {% endif %}
+            </label>
+        {% endif %}
+    {% endfor %}
+    {% if search %}
+        <label class="relative mr-2.5 inline-block">Hledat <input type="text" name="search" value="{{ search.value }}" placeholder="{{ search.placeholder }}"></label>
+    {% endif %}
+    <button type="submit" class="btn">Filtrovat</button>
+    <a href="{{ path(app.request.attributes.get('_route')) }}" class="reset text-xs">zrušit filtr</a>
+    {% if export_url ?? false %}
+        <a href="{{ export_url }}" class="btn btn-export" data-turbo="false">Export do CSV</a>
+    {% endif %}
+</form>

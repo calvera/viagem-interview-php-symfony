@@ -1,0 +1,16 @@
+{# Pages around the current one (±4), first and last page, previous and next. #}
+{% if list.pages > 1 %}
+    {% set route = app.request.attributes.get('_route') %}
+    {% set params = app.request.query.all %}
+    {% set from = max(1, list.page - 4) %}
+    {% set to = min(list.pages, list.page + 4) %}
+    <div class="pagination my-3 [&>a]:mr-0.5 [&>a]:inline-block [&>a]:px-[7px] [&>a]:py-[3px] [&>b]:mr-0.5 [&>b]:inline-block [&>b]:bg-nav [&>b]:px-[7px] [&>b]:py-[3px] [&>b]:text-white">
+        {% if list.page > 1 %}<a href="{{ path(route, params|merge({page: list.page - 1})) }}">‹ předchozí</a> {% endif %}
+        {% if from > 1 %}<a href="{{ path(route, params|merge({page: 1})) }}">1</a> … {% endif %}
+        {% for i in from..to %}
+            {% if i == list.page %}<b>{{ i }}</b>{% else %}<a href="{{ path(route, params|merge({page: i})) }}">{{ i }}</a>{% endif %}
+        {% endfor %}
+        {% if to < list.pages %} … <a href="{{ path(route, params|merge({page: list.pages})) }}">{{ list.pages }}</a>{% endif %}
+        {% if list.page < list.pages %} <a href="{{ path(route, params|merge({page: list.page + 1})) }}">další ›</a>{% endif %}
+    </div>
+{% endif %}

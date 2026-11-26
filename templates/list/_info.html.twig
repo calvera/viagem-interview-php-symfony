@@ -1,0 +1,6 @@
+{# list: ListPage, item_name: "obcí", search: shown search text #}
+<div class="section_info my-2 text-label">
+    Nalezeno <b>{{ list.total|number_format(0, ',', ' ') }}</b> {{ item_name }}
+    {%- if search != '' %} pro hledaný výraz „<b>{{ search }}</b>“{% endif %}
+    {%- if list.pages > 1 %}, strana {{ list.page }} z {{ list.pages|number_format(0, ',', ' ') }}{% endif %}
+</div>

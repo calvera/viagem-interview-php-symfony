@@ -1,0 +1,5 @@
+{# Column header link: asc, or desc when already sorted asc by this key; the page is dropped. #}
+{% set active = query.sort == key %}
+<a href="{{ path(app.request.attributes.get('_route'), app.request.query.all|filter((v, k) => k != 'page')|merge({sort: key, dir: active and query.dir == 'asc' ? 'desc' : 'asc'})) }}">
+    {{- label }}{% if active %} {{ query.dir == 'asc' ? '▲' : '▼' }}{% endif -%}
+</a>

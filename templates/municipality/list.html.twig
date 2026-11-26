@@ -5,4 +5,48 @@
 
 {% block body %}
     <h1>Obce</h1>
+
+    {{ include('list/_filters.html.twig', {
+        filters: [
+            {name: 'f_district', label: 'Okres', type: 'select', value: query.district, options: districts},
+            {name: 'f_region', label: 'Kraj', type: 'select', value: query.region, options: regions},
+        ],
+        search: {value: query.search, placeholder: 'název nebo kód obce'},
+    }) }}
+    {{ include('list/_info.html.twig', {item_name: 'obcí', search: query.search}) }}
+
+    {% if list.total == 0 %}
+        <p class="empty">Nebyly nalezeny žádné obcí.</p>
+    {% else %}
+        <table class="table-list">
+            <thead>
+                <tr>
+                    <th class="w-[8%]">{{ include('list/_sort_link.html.twig', {label: 'Kód', key: 'code'}) }}</th>
+                    <th class="w-[30%]">{{ include('list/_sort_link.html.twig', {label: 'Název', key: 'name'}) }}</th>
+                    <th class="w-[20%]">{{ include('list/_sort_link.html.twig', {label: 'Okres', key: 'district'}) }}</th>
+                    <th class="w-[18%]">{{ include('list/_sort_link.html.twig', {label: 'Kraj', key: 'region'}) }}</th>
+                    <th class="w-[8%]">Parcel</th>
+                    <th class="w-[8%]"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for m in list.items %}
+                    <tr>
+                        <td>{{ m.code }}</td>
+                        <td>{{ m.name }}</td>
+                        <td>{{ m.district }}</td>
+                        <td>{{ m.region }}</td>
+                        <td class="right">{{ (parcel_counts[m.id] ?? 0)|number_format(0, ',', ' ') }}</td>
+                        <td>
+                            <span class="buttons whitespace-nowrap">
+                                <a href="{{ path('owner_list', {f_municipality_id: m.id}) }}" class="btn btn-sm">vlastníci</a>
+                                <a href="{{ path('parcel_list', {f_municipality_id: m.id}) }}" class="btn btn-sm">parcely</a>
+                            </span>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {{ include('list/_pagination.html.twig') }}
+    {% endif %}
 {% endblock %}
