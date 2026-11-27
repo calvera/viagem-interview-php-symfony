@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
+use App\Dto\QueryParam;
 use App\Dto\ListPage;
 use App\Dto\OwnerListQuery;
 use App\Entity\Municipality;
@@ -33,12 +34,14 @@ class OwnerRepository extends ServiceEntityRepository
      * Filters, search and sort of the owners list, shared with the CSV export.
      * The default sort (last name, first name, id) reads the page from index idx_owners_name.
      */
-    public function listQueryBuilder(OwnerListQuery $query): QueryBuilder
+    public function listQueryBuilder(OwnerListQuery $query, bool $withMunicipality = false): QueryBuilder
     {
         $qb = $this->createQueryBuilder('o');
+        if ($query->municipality !== '' || $withMunicipality) {
+            $qb->leftJoin('o.municipality', 'm')->addSelect('m');
+        }
         if ($query->municipality !== '') {
-            $qb->leftJoin('o.municipality', 'm')->addSelect('m')
-                ->andWhere('m.name LIKE :municipality')->setParameter('municipality', '%'.$query->municipality.'%');
+            $qb->andWhere('m.name LIKE :municipality')->setParameter('municipality', '%'.$query->municipality.'%');
         }
         if ($query->municipalityId !== '') {
             $qb->andWhere('o.municipality = :municipalityId')->setParameter('municipalityId', (int) $query->municipalityId);
@@ -56,12 +59,39 @@ class OwnerRepository extends ServiceEntityRepository
             $qb->andWhere('o.lastName LIKE :search OR o.firstName LIKE :search')->setParameter('search', '%'.$query->search.'%');
         }
         if ($query->sort !== '') {
-            return $qb->orderBy('o.createdAt', $query->dir)->addOrderBy('o.id');
+            return $qb->orderBy('o.createdAt', QueryParam::direction($query->dir))->addOrderBy('o.id');
         }
 
         // With a search text MariaDB cannot estimate LIKE '%…%' and would walk the whole name index for a rare
         // name; "o.id + 0" gives the same order but not from the index, so it filters first and sorts (as legacy).
         return $qb->orderBy('o.lastName')->addOrderBy('o.firstName')->addOrderBy($query->search !== '' ? 'o.id + 0' : 'o.id');
+    }
+
+    /**
+     * Owners of the export with their municipality, read one by one; without "all" the do-not-contact owners
+     * are left out in SQL, so the limit counts only exported rows (as legacy).
+     *
+     * @return iterable<Owner>
+     */
+    public function exportRows(OwnerListQuery $query, int $limit): iterable
+    {
+        $qb = $this->listQueryBuilder($query, withMunicipality: true)->setMaxResults($limit);
+        if (!$query->all) {
+            $qb->andWhere('o.doNotContact = false');
+        }
+
+        return $qb->getQuery()->toIterable();
+    }
+
+    /** Number of do-not-contact owners matching the list filters. */
+    public function countDoNotContact(OwnerListQuery $query): int
+    {
+        return (int) $this->listQueryBuilder($query)
+            ->resetDQLPart('orderBy')
+            ->select('COUNT(o.id)')
+            ->andWhere('o.doNotContact = true')
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 
     /**

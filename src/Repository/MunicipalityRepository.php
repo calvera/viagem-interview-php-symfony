@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
+use App\Dto\QueryParam;
 use App\Dto\ListPage;
 use App\Dto\MunicipalityListQuery;
 use App\Entity\Municipality;
@@ -32,7 +33,7 @@ class MunicipalityRepository extends ServiceEntityRepository
         if ($query->search !== '') {
             $qb->andWhere('m.name LIKE :search OR m.code LIKE :search')->setParameter('search', '%'.$query->search.'%');
         }
-        $qb->orderBy('m.'.($query->sort ?: 'name'), $query->sort ? $query->dir : 'asc')->addOrderBy('m.id');
+        $qb->orderBy('m.'.($query->sort ?: 'name'), QueryParam::direction($query->sort ? $query->dir : 'asc'))->addOrderBy('m.id');
 
         return ListPage::of($qb, $query->page);
     }

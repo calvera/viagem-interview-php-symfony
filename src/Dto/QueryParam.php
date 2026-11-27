@@ -35,6 +35,12 @@ final class QueryParam
         return \is_string($value) && strtolower($value) === 'desc' ? 'desc' : 'asc';
     }
 
+    /** Doctrine sort direction of a normalized "asc"/"desc". */
+    public static function direction(string $dir): \SortDirection
+    {
+        return $dir === 'desc' ? \SortDirection::Descending : \SortDirection::Ascending;
+    }
+
     /** Page number from 1 (intval like legacy, the list clamps it to the last page). */
     public static function page(mixed $value): int
     {

@@ -77,4 +77,10 @@ final readonly class OwnerListQuery
     {
         return $this->municipalityInput !== '' && $this->municipality === '' ? 'zadejte aspoň '.self::MUNICIPALITY_MIN_LENGTH.' znaky' : null;
     }
+
+    /** The same filters in the default order (the export ignores sort as in legacy). */
+    public function withoutSort(): self
+    {
+        return clone($this, ['sort' => '']);
+    }
 }

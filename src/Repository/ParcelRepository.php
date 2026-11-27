@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
+use App\Dto\QueryParam;
 use App\Dto\ListPage;
 use App\Dto\ParcelListQuery;
 use App\Entity\Ownership;
@@ -40,7 +41,7 @@ class ParcelRepository extends ServiceEntityRepository
             $qb->andWhere('p.parcelNumber LIKE :search OR p.cadastralCode LIKE :search')->setParameter('search', '%'.$query->search.'%');
         }
         if ($query->sort !== '') {
-            $qb->orderBy(self::SORT_FIELDS[$query->sort], $query->dir);
+            $qb->orderBy(self::SORT_FIELDS[$query->sort], QueryParam::direction($query->dir));
         }
         $qb->addOrderBy('p.id');
 
