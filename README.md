@@ -1,6 +1,6 @@
 # Evidence vlastníků (Symfony)
 
-Přepis legacy aplikace `../legacy-app` (ruční PHP, v2.8.1) do Symfony 8.1 a PHP 8.5. Twig šablony jsou stylované Tailwindem 4 přes Vite. Aplikace eviduje vlastníky pozemků, parcely a obce a funkčně odpovídá legacy 1:1. Má přehled, výpisy s filtry, detail vlastníka s poznámkami, úpravu vlastníka, CSV export, našeptávač obcí a noční report.
+Přepis legacy aplikace `legacy-app` (ruční PHP, v2.8.1) do Symfony 8.1 a PHP 8.5. Twig šablony jsou stylované Tailwindem 4 přes Vite. Aplikace eviduje vlastníky pozemků, parcely a obce a funkčně odpovídá legacy 1:1. Má přehled, výpisy s filtry, detail vlastníka s poznámkami, úpravu vlastníka, CSV export, našeptávač obcí a noční report.
 
 ## Stack
 
