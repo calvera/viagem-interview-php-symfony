@@ -1,8 +1,60 @@
 {% extends 'base.html.twig' %}
+{% import '_macros.html.twig' as m %}
 {% set menu = 'dashboard' %}
 
 {% block title %}Přehled{% endblock %}
 
 {% block body %}
     <h1>Přehled</h1>
+
+    <div class="cards flex flex-wrap gap-3">
+        {% for card in [
+            {title: 'Vlastníci', value: counts.owners, url: path('owner_list')},
+            {title: 'Parcely', value: counts.parcels, url: null},
+            {title: 'Vlastnické vztahy', value: counts.ownerships, url: null},
+            {title: 'Obce', value: counts.municipalities, url: path('municipality_list')},
+        ] %}
+            <div class="card">
+                <div class="card-value text-2xl font-bold">{{ card.value|number_format(0, ',', ' ') }}</div>
+                <div class="card-title">{% if card.url %}<a href="{{ card.url }}">{{ card.title }}</a>{% else %}{{ card.title }}{% endif %}</div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <h2>Poslední poznámky</h2>
+
+    {% if notes is empty %}
+        <p class="empty">Žádné poznámky.</p>
+    {% else %}
+        <table class="table-list">
+            <thead>
+                <tr><th class="w-[15%]">Datum</th><th class="w-[25%]">Vlastník</th><th>Poznámka</th><th class="w-[12%]">Zapsal</th></tr>
+            </thead>
+            <tbody>
+                {% for note in notes %}
+                    <tr>
+                        <td>{{ m.date_or(note.createdAt, '–', 'j. n. Y H:i') }}</td>
+                        <td><a href="{{ path('owner_detail', {id: note.owner.id}) }}">{{ note.owner.displayName }}</a></td>
+                        <td>{{ note.note|length > 120 ? note.note|slice(0, 120) ~ '…' : note.note }}</td>
+                        <td>{{ note.createdBy }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    <h2>Noční report</h2>
+
+    {% if runs is not empty %}
+        <p class="hint">
+            Poslední běhy:
+            {% for run in runs %}{{ m.date_or(run.runDate) }} ({{ run.duration }} s){% if not loop.last %}, {% endif %}{% endfor %}
+        </p>
+    {% endif %}
+
+    {% if report is not null %}
+        <pre class="report overflow-auto border border-panel-line bg-panel p-3">{{ report }}</pre>
+    {% else %}
+        <p class="empty">Report zatím nebyl vygenerován. Spouští se v noci příkazem <code>bin/console app:nightly-report</code>.</p>
+    {% endif %}
 {% endblock %}

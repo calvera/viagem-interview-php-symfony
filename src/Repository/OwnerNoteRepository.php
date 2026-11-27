@@ -25,6 +25,18 @@ class OwnerNoteRepository extends ServiceEntityRepository
         return $this->findBy(['owner' => $owner], ['createdAt' => 'DESC', 'id' => 'DESC']);
     }
 
+    /** @return list<OwnerNote> newest notes (by id) with their owners */
+    public function latest(int $limit): array
+    {
+        return $this->createQueryBuilder('n')
+            ->addSelect('o')
+            ->join('n.owner', 'o')
+            ->orderBy('n.id', \SortDirection::Descending)
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
     /** Deletes the note only when it belongs to the owner; true when a row was deleted. */
     public function deleteOwnerNote(Owner $owner, int $noteId): bool
     {

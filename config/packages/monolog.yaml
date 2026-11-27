@@ -3,7 +3,13 @@ monolog:
         - deprecation # Deprecations are logged in the dedicated "deprecation" channel when it exists
         - owners
         - export
+        - cron
     handlers:
+        cron:
+            type: stream
+            path: "%kernel.logs_dir%/cron.log"
+            level: info
+            channels: [cron]
         export:
             type: stream
             path: "%kernel.logs_dir%/export.log"
