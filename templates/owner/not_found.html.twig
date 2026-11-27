@@ -1,0 +1,9 @@
+{% extends 'base.html.twig' %}
+{% set menu = 'owners' %}
+
+{% block title %}Vlastník nenalezen{% endblock %}
+
+{% block body %}
+    <h1>Vlastník nenalezen</h1>
+    <p>Vlastník s ID {{ id }} v evidenci není. <a href="{{ path('owner_list') }}">Zpět na výpis vlastníků</a></p>
+{% endblock %}

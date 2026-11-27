@@ -1,0 +1,102 @@
+{% extends 'base.html.twig' %}
+{% import '_macros.html.twig' as m %}
+{% set menu = 'owners' %}
+
+{% block title %}{{ owner.detailName }}{% endblock %}
+
+{% block body %}
+    <p class="back mb-2.5">
+        <a href="javascript:history.back()">‹ zpět</a>
+    </p>
+
+    <h1>
+        {{ owner.detailName }}
+        {% if owner.doNotContact %}<span class="badge badge-red">neoslovovat</span>{% endif %}
+    </h1>
+
+    <div class="grid grid-cols-2 gap-6 max-[800px]:grid-cols-1">
+        <table class="table-detail">
+            <tr><th>ID</th><td>{{ owner.id }}</td></tr>
+            <tr><th>Typ</th><td>Vlastník je {{ owner.type.label|lower }}</td></tr>
+            {% if owner.type.value == 'P' %}
+                <tr><th>IČO</th><td>{{ owner.ico }}</td></tr>
+            {% else %}
+                <tr><th>Titul</th><td>{{ owner.title }}</td></tr>
+                <tr><th>Datum narození</th><td>{{ m.date_or(owner.birthDate) }}</td></tr>
+            {% endif %}
+            <tr><th>Adresa</th><td>{{ owner.street }}, {{ owner.zip }} {{ owner.city }}</td></tr>
+            <tr><th>Obec (KN)</th><td>{{ owner.municipality.name }} <small>({{ owner.municipality.code }}, okres {{ owner.municipality.district }})</small></td></tr>
+            <tr><th>Telefon</th><td>{{ owner.phone }}</td></tr>
+            <tr><th>E-mail</th><td>{{ owner.email }}</td></tr>
+        </table>
+
+        <table class="table-detail">
+            <tr><th>Termín oslovení</th><td>{{ m.date_or(owner.duedate, 'nenastaven') }}</td></tr>
+            <tr><th>Založeno</th><td>{{ m.date_or(owner.createdAt, '–', 'j. n. Y H:i') }}</td></tr>
+            <tr><th>Počet parcel</th><td>{{ ownerships|length }}</td></tr>
+            <tr><th>Výměra celkem</th><td>{{ total_area }}</td></tr>
+            <tr><th>Výměra dle podílů</th><td>{{ share_area }}</td></tr>
+            <tr><th>Poznámka</th><td>{{ owner.note|nl2br }}</td></tr>
+        </table>
+    </div>
+
+    <h2>Parcely ({{ ownerships|length }})</h2>
+
+    {% if ownerships is empty %}
+        <p class="empty">Vlastník nemá v evidenci žádné parcely.</p>
+    {% else %}
+        <table class="table-list">
+            <thead>
+                <tr>
+                    <th>Obec</th>
+                    <th>Katastrální území</th>
+                    <th>Parcela</th>
+                    <th>LV</th>
+                    <th>Druh pozemku</th>
+                    <th class="right">Výměra</th>
+                    <th class="right">Podíl</th>
+                    <th class="right">Výměra podílu</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for os in ownerships %}
+                    <tr>
+                        <td>{{ os.parcel.municipality.name }}</td>
+                        <td>{{ os.parcel.cadastralArea }} <small>({{ os.parcel.cadastralCode }})</small></td>
+                        <td>{{ os.parcel.parcelNumber }}</td>
+                        <td>{{ os.lvNumber }}</td>
+                        <td>{{ os.parcel.landType|capitalize }}</td>
+                        <td class="right">{{ os.parcel.area }}</td>
+                        <td class="right">{{ os.shareLabel }}</td>
+                        <td class="right">{{ os.shareArea ? os.shareArea.rounded : '–' }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    <h2 id="notes">Poznámky ({{ notes|length }})</h2>
+
+    <form method="post" action="{{ path('owner_note_add', {id: owner.id}) }}" class="note-form mb-2.5">
+        <input type="hidden" name="_token" value="{{ csrf_token('owner_note') }}">
+        <textarea name="note" rows="3" placeholder="Nová poznámka…" class="mb-1.5 w-full"></textarea>
+        <button type="submit" class="btn">Přidat poznámku</button>
+    </form>
+
+    {% if notes is empty %}
+        <p class="empty">Zatím žádné poznámky.</p>
+    {% endif %}
+
+    {% for note in notes %}
+        <div class="note my-2.5 border-l-[3px] border-primary bg-panel px-2.5 py-2">
+            <div class="note-head mb-1 text-xs text-label">
+                <b>{{ note.createdBy }}</b>, {{ m.date_or(note.createdAt, '–', 'j. n. Y H:i') }}
+                <form method="post" action="{{ path('owner_note_delete', {id: owner.id, noteId: note.id}) }}" class="float-right" data-turbo-confirm="Opravdu smazat poznámku?">
+                    <input type="hidden" name="_token" value="{{ csrf_token('owner_note') }}">
+                    <button type="submit" class="cursor-pointer text-danger underline">smazat</button>
+                </form>
+            </div>
+            <div class="note-text">{{ note.note|nl2br }}</div>
+        </div>
+    {% endfor %}
+{% endblock %}
