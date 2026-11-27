@@ -9,7 +9,7 @@
     {{ include('list/_filters.html.twig', {
         filters: [
             {name: 'f_municipality_id', label: 'Obec', type: 'hidden', value: query.municipalityId, title: municipality.name ?? null},
-            {name: 'f_municipality', label: 'Obec', type: 'text', value: query.municipality},
+            {name: 'f_municipality', label: 'Obec', type: 'autocomplete', value: query.municipality},
             {name: 'f_land_type', label: 'Druh', type: 'select', value: query.landType, options: land_types},
         ],
         search: {value: query.search, placeholder: 'číslo parcely nebo kód k. ú.'},

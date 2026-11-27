@@ -10,7 +10,7 @@
     {{ include('list/_filters.html.twig', {
         filters: [
             {name: 'f_municipality_id', label: 'Obec', type: 'hidden', value: query.municipalityId, title: municipality.name ?? null},
-            {name: 'f_municipality', label: 'Obec', type: 'text', value: query.municipality, input: query.municipalityInput, note: query.municipalityNote},
+            {name: 'f_municipality', label: 'Obec', type: 'autocomplete', value: query.municipality, input: query.municipalityInput, note: query.municipalityNote},
             {name: 'f_type', label: 'Typ', type: 'select', value: query.type, options: {F: 'Fyzická osoba', P: 'Právnická osoba'}},
             {name: 'f_dnc', label: 'Neoslovovat', type: 'select', value: query.dnc, options: {1: 'ano', 0: 'ne'}},
         ],

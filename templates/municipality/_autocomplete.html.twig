@@ -1,0 +1,3 @@
+{% for m in municipalities %}
+    <li role="option" data-autocomplete-value="{{ m.name }}" data-autocomplete-label="{{ m.name }}">{{ m.name }} (okres {{ m.district }})</li>
+{% endfor %}

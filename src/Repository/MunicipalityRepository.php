@@ -21,6 +21,23 @@ class MunicipalityRepository extends ServiceEntityRepository
         parent::__construct($registry, Municipality::class);
     }
 
+    /**
+     * Municipalities whose name starts with the prefix, for the autocomplete (as legacy, LIKE wildcards are not escaped).
+     *
+     * @return list<Municipality>
+     */
+    public function startingWith(string $prefix, int $limit = 15): array
+    {
+        return $this->createQueryBuilder('m')
+            ->where('m.name LIKE :prefix')
+            ->setParameter('prefix', $prefix.'%')
+            ->orderBy('m.name')
+            ->addOrderBy('m.id')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
     public function paginate(MunicipalityListQuery $query): ListPage
     {
         $qb = $this->createQueryBuilder('m');
