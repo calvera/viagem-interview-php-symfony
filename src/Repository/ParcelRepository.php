@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
-use App\Dto\QueryParam;
 use App\Dto\ListPage;
 use App\Dto\ParcelListQuery;
+use App\Dto\QueryParam;
 use App\Entity\Ownership;
 use App\Entity\Parcel;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;

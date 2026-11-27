@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
-use App\Dto\QueryParam;
 use App\Dto\ListPage;
 use App\Dto\MunicipalityListQuery;
+use App\Dto\QueryParam;
 use App\Entity\Municipality;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;

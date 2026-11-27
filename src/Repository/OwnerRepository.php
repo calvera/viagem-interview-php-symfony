@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
-use App\Dto\QueryParam;
 use App\Dto\ListPage;
 use App\Dto\OwnerListQuery;
+use App\Dto\QueryParam;
 use App\Entity\Municipality;
 use App\Entity\Owner;
 use App\Value\Area;

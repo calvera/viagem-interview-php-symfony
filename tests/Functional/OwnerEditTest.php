@@ -46,7 +46,7 @@ final class OwnerEditTest extends WebTestCase
     {
         $owner = OwnerFactory::new()->company('Statek Lhota spol. s r.o.', '01256748')->create();
 
-        $crawler = $this->get('/vlastnici/'.$owner->id.'/upravit');
+        $crawler = $this->get('/vlastnici/'.$owner->id.'/uprava');
 
         self::assertSame(['Název firmy', 'IČO'], \array_slice($crawler->filter('form th')->each(static fn (Crawler $th): string => $th->text()), 0, 2));
         self::assertSame('Statek Lhota spol. s r.o.', $this->form($crawler)->getValues()['owner[lastName]']);
@@ -58,7 +58,7 @@ final class OwnerEditTest extends WebTestCase
     public function testSaveNormalizesValuesLogsAndRedirectsToDetail(): void
     {
         $owner = OwnerFactory::createOne(['title' => 'Ing.', 'doNotContact' => true]);
-        $crawler = $this->get('/vlastnici/'.$owner->id.'/upravit');
+        $crawler = $this->get('/vlastnici/'.$owner->id.'/uprava');
 
         $form = $this->form($crawler, [
             'owner[title]' => '  ', 'owner[firstName]' => ' Jan ', 'owner[lastName]' => ' Novák ', 'owner[zip]' => ' 100 31 ',
@@ -82,7 +82,7 @@ final class OwnerEditTest extends WebTestCase
     public function testValidationErrorsInLegacyOrderKeepInput(): void
     {
         $owner = OwnerFactory::createOne(['lastName' => 'Svobodová']);
-        $crawler = $this->get('/vlastnici/'.$owner->id.'/upravit');
+        $crawler = $this->get('/vlastnici/'.$owner->id.'/uprava');
 
         $crawler = $this->client->submit($this->form($crawler, [
             'owner[lastName]' => ' ', 'owner[zip]' => '1234', 'owner[email]' => 'neplatny@', 'owner[phone]' => str_repeat('1', 21), 'owner[city]' => 'Brno',
@@ -100,9 +100,9 @@ final class OwnerEditTest extends WebTestCase
     public function testInvalidDateCompanyNameAndCsrf(): void
     {
         $owner = OwnerFactory::new()->company('Firma s.r.o.', '12345678')->create();
-        $this->get('/vlastnici/'.$owner->id.'/upravit');
+        $this->get('/vlastnici/'.$owner->id.'/uprava');
 
-        $crawler = $this->client->request('POST', '/vlastnici/'.$owner->id.'/upravit', ['owner' => ['lastName' => '', 'duedate' => '31.02.', '_token' => 'bad']]);
+        $crawler = $this->client->request('POST', '/vlastnici/'.$owner->id.'/uprava', ['owner' => ['lastName' => '', 'duedate' => '31.02.', '_token' => 'bad']]);
 
         self::assertResponseStatusCodeSame(422);
         self::assertSame(
@@ -114,7 +114,7 @@ final class OwnerEditTest extends WebTestCase
 
     public function testMissingOwner(): void
     {
-        $crawler = $this->get('/vlastnici/999999999/upravit');
+        $crawler = $this->get('/vlastnici/999999999/uprava');
 
         self::assertSelectorTextSame('h1', 'Vlastník nenalezen');
         self::assertSelectorTextSame('#main_content p', 'Zpět na výpis vlastníků');
