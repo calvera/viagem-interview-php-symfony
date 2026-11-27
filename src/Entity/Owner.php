@@ -71,9 +71,14 @@ class Owner
     }
 
     /** Name in lists: company name, or "title first last" of a person. */
+    public function isCompany(): bool
+    {
+        return $this->type === OwnerType::Company;
+    }
+
     public function displayName(): string
     {
-        if ($this->type === OwnerType::Company) {
+        if ($this->isCompany()) {
             return $this->lastName;
         }
 
@@ -83,7 +88,7 @@ class Owner
     /** Name on the detail page: a person without a first name is shown by the last name only (no title). */
     public function detailName(): string
     {
-        $name = $this->type === OwnerType::Company ? $this->lastName : $this->firstName;
+        $name = $this->isCompany() ? $this->lastName : $this->firstName;
 
         return $name ? $this->displayName() : $this->lastName;
     }

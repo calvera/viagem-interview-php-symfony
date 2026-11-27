@@ -7,6 +7,7 @@
 {% block body %}
     <p class="back mb-2.5">
         <a href="javascript:history.back()">‹ zpět</a>
+        <a href="{{ path('owner_edit', {id: owner.id}) }}" class="btn float-right">Upravit údaje</a>
     </p>
 
     <h1>
@@ -18,7 +19,7 @@
         <table class="table-detail">
             <tr><th>ID</th><td>{{ owner.id }}</td></tr>
             <tr><th>Typ</th><td>Vlastník je {{ owner.type.label|lower }}</td></tr>
-            {% if owner.type.value == 'P' %}
+            {% if owner.isCompany %}
                 <tr><th>IČO</th><td>{{ owner.ico }}</td></tr>
             {% else %}
                 <tr><th>Titul</th><td>{{ owner.title }}</td></tr>

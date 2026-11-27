@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+{% set menu = 'owners' %}
+
+{% block title %}Úprava – {{ owner.displayName }}{% endblock %}
+
+{% block body %}
+    <p class="back mb-2.5"><a href="{{ path('owner_detail', {id: owner.id}) }}">‹ zpět na detail</a></p>
+
+    <h1>Úprava vlastníka</h1>
+
+    {% for error in errors %}
+        <div class="flash flash-error">{{ error.message }}</div>
+    {% endfor %}
+
+    {{ form_start(form, {attr: {class: 'edit-form'}}) }}
+        <table class="table-detail">
+            {% if owner.isCompany %}
+                <tr><th>Název firmy</th><td>{{ form_widget(form.lastName, {attr: {size: 50}}) }}</td></tr>
+                <tr><th>IČO</th><td>{{ owner.ico }}</td></tr>
+            {% else %}
+                <tr><th>Titul</th><td>{{ form_widget(form.title, {attr: {size: 10}}) }}</td></tr>
+                <tr><th>Jméno</th><td>{{ form_widget(form.firstName) }}</td></tr>
+                <tr><th>Příjmení</th><td>{{ form_widget(form.lastName) }}</td></tr>
+            {% endif %}
+            <tr><th>Ulice a č. p.</th><td>{{ form_widget(form.street, {attr: {size: 40}}) }}</td></tr>
+            <tr><th>PSČ / město</th><td>
+                {{ form_widget(form.zip, {attr: {size: 6}}) }}
+                {{ form_widget(form.city, {attr: {size: 30}}) }}
+            </td></tr>
+            <tr><th>Telefon</th><td>{{ form_widget(form.phone) }}</td></tr>
+            <tr><th>E-mail</th><td>{{ form_widget(form.email, {attr: {size: 40}}) }}</td></tr>
+            <tr><th>Termín oslovení</th><td>{{ form_widget(form.duedate) }}</td></tr>
+            <tr><th>Neoslovovat</th><td>
+                <label>{{ form_widget(form.doNotContact) }} vlastník si nepřeje být kontaktován</label>
+            </td></tr>
+            <tr><th>Poznámka</th><td>{{ form_widget(form.note, {attr: {rows: 3, cols: 60}}) }}</td></tr>
+        </table>
+        <p class="mt-2.5"><button type="submit" class="btn">Uložit</button></p>
+    {{ form_end(form) }}
+{% endblock %}

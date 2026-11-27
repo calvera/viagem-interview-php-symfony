@@ -8,14 +8,18 @@ use App\Dto\OwnerListQuery;
 use App\Entity\Owner;
 use App\Entity\OwnerNote;
 use App\Entity\Ownership;
+use App\Form\OwnerEditData;
+use App\Form\OwnerType;
 use App\Repository\MunicipalityRepository;
 use App\Repository\OwnerNoteRepository;
 use App\Repository\OwnerRepository;
 use App\Repository\OwnershipRepository;
 use App\Value\Area;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
@@ -62,6 +66,34 @@ final class OwnerController extends AbstractController
             'share_area' => new Area(array_sum(array_map(static fn (Ownership $os): float => $os->shareArea()->m2 ?? 0, $shares)))->rounded(),
             'notes' => $notes->forOwner($owner),
         ]);
+    }
+
+    #[Route('/vlastnici/{id}/upravit', name: 'owner_edit', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
+    public function edit(
+        int $id,
+        Request $request,
+        OwnerRepository $owners,
+        EntityManagerInterface $em,
+        #[Target('owners')] LoggerInterface $logger,
+        #[Autowire('%env(APP_USER)%')] string $user,
+    ): Response {
+        $owner = $owners->find($id);
+        if ($owner === null) {
+            return $this->render('owner/not_found.html.twig', ['id' => null]);
+        }
+        $data = OwnerEditData::fromOwner($owner);
+        $form = $this->createForm(OwnerType::class, $data, ['company' => $owner->isCompany()]);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data->applyTo($owner);
+            $em->flush();
+            $this->addFlash('ok', 'Údaje vlastníka byly uloženy.');
+            $logger->info($user.' upravil vlastníka '.$id);
+
+            return $this->redirectToRoute('owner_detail', ['id' => $id], Response::HTTP_SEE_OTHER);
+        }
+
+        return $this->render('owner/edit.html.twig', ['owner' => $owner, 'form' => $form, 'errors' => $form->getErrors(true)]);
     }
 
     #[Route('/vlastnici/{id}/poznamky', name: 'owner_note_add', requirements: ['id' => '\d+'], methods: ['POST'])]

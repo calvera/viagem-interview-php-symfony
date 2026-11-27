@@ -1,6 +1,13 @@
 monolog:
     channels: # To see all channels, run bin/console debug:autowiring logger
         - deprecation # Deprecations are logged in the dedicated "deprecation" channel when it exists
+        - owners
+    handlers:
+        owners:
+            type: stream
+            path: "%kernel.logs_dir%/owners.log"
+            level: info
+            channels: [owners]
 
 when@dev:
     monolog:
